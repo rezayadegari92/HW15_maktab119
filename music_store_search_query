@@ -15,5 +15,132 @@ FROM Albums a
 LEFT JOIN tracks t ON a.album_id = t.album_id GROUP BY a.album_id ORDER BY total_price DESC;
 
 
-----------------------------------------------------------------------02
+------------------------------------02
 
+WITH track_sales AS (
+    -- Calculate total sales for each track
+    SELECT
+        t.track_id,
+        t.name AS track_name,
+        SUM(o.quantity) AS total_sales
+    FROM
+        Orders_Tracks ot
+    JOIN Orders o ON ot.order_id = o.order_id
+    JOIN Tracks t ON ot.track_id = t.track_id
+    GROUP BY
+        t.track_id
+),
+best_selling_track AS (
+    -- Find the best-selling track
+    SELECT
+        MAX(total_sales) AS max_sales
+    FROM
+        track_sales
+)
+-- Select tracks that sell at least 60% of the best-selling track
+SELECT
+    ts.track_id,
+    ts.track_name,
+    ts.total_sales
+FROM
+    track_sales ts
+WHERE
+    ts.total_sales >= (SELECT 0.6 * max_sales FROM best_selling_track)
+ORDER BY
+    ts.total_sales DESC;
+-------------------------------03
+SELECT
+    a.artist_id,
+    a.name AS artist_name,
+    COUNT(t.track_id) AS number_of_rock_tracks
+FROM
+    Artists a
+JOIN Albums al ON a.artist_id = al.artist_id
+JOIN Tracks t ON al.album_id = t.album_id
+WHERE
+    al.genre = 'rock'
+GROUP BY
+    a.artist_id
+HAVING
+    COUNT(t.track_id) >= 3
+ORDER BY
+    number_of_rock_tracks DESC;
+------------------------------------------04
+
+SELECT 
+    u.name AS customer_name,
+    o.order_id,
+    o.date AS order_date,
+    o.total_price
+FROM 
+    Users u
+JOIN Orders o ON u.user_id = o.user_id
+WHERE
+    o.date = (
+        SELECT MAX(date)
+        FROM Orders
+        WHERE user_id = u.user_id
+    )
+ORDER BY
+    o.date DESC;
+--------------------------05
+SELECT
+    a.album_id,
+    a.title AS album_title,
+    COUNT(ot.track_id) AS number_of_sold_tracks,
+	COUNT(t.track_id) as total_tracks_count
+FROM
+    Albums a
+JOIN Tracks t ON a.album_id = t.album_id
+LEFT JOIN Orders_Tracks ot ON t.track_id = ot.track_id
+LEFT JOIN Orders o ON ot.order_id = o.order_id
+GROUP BY
+    a.album_id, a.title
+HAVING
+    COUNT(ot.track_id) = 1
+ORDER BY
+    a.album_id;
+---------------------------06
+-- Step 1: Calculate total sales by genre
+WITH genre_sales AS (
+    SELECT
+        t.genre,
+        SUM(o.quantity) AS total_genre_sales
+    FROM
+        Tracks t
+    JOIN Orders_Tracks ot ON t.track_id = ot.track_id
+    JOIN Orders o ON ot.order_id = o.order_id
+    GROUP BY
+        t.genre
+),
+
+-- Step 2: Calculate total sales for each track
+track_sales AS (
+    SELECT
+        t.track_id,
+        t.name AS track_name,
+        t.genre,
+        SUM(o.quantity) AS total_track_sales
+    FROM
+        Tracks t
+    JOIN Orders_Tracks ot ON t.track_id = ot.track_id
+    JOIN Orders o ON ot.order_id = o.order_id
+    GROUP BY
+        t.track_id, t.genre
+),
+
+-- Step 3: Identify tracks with sales below 0.002 of their genre's total sales
+low_sales_tracks AS (
+    SELECT
+        ts.track_id
+    FROM
+        track_sales ts
+    JOIN genre_sales gs ON ts.genre = gs.genre
+    WHERE
+        ts.total_track_sales < (0.002 * gs.total_genre_sales)
+)
+
+-- Step 4: Update price by reducing it by 50% for identified tracks
+UPDATE Tracks
+SET price = price * 0.5
+WHERE track_id IN (SELECT track_id FROM low_sales_tracks);
