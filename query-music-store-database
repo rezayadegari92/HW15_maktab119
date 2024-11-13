@@ -71,3 +71,89 @@ CREATE TABLE A_A (
     album_id INT REFERENCES Albums(album_id) ON DELETE CASCADE,
     PRIMARY KEY (artist_id, album_id)
 );
+--------------------------------------------
+-- Insert data into Users table (with only one 'admin' role)
+INSERT INTO Users (name, address, phone, role, email) VALUES
+('John Doe', '123 Elm St, Springfield, IL', '555-1234', 'admin', 'john.doe@email.com'),
+('Jane Smith', '456 Oak St, Springfield, IL', '555-5678', 'customer', 'jane.smith@email.com'),
+('Alex Johnson', '789 Pine St, Springfield, IL', '555-8765', 'customer', 'alex.johnson@email.com'),
+('Emily White', '321 Maple St, Springfield, IL', '555-4321', 'customer', 'emily.white@email.com'),
+('Michael Brown', '654 Birch St, Springfield, IL', '555-3456', 'customer', 'michael.brown@email.com'),
+('Sarah Davis', '987 Cedar St, Springfield, IL', '555-7654', 'customer', 'sarah.davis@email.com'),
+('David Lee', '123 Walnut St, Springfield, IL', '555-2345', 'customer', 'david.lee@email.com');
+
+-- Insert data into Artists table
+INSERT INTO Artists (name, description) VALUES
+('The Rolling Stones', 'Legendary rock band formed in 1962'),
+('Beyoncé', 'Iconic pop and R&B singer, songwriter, and actress'),
+('Miles Davis', 'Influential jazz trumpeter and composer'),
+('Ludwig van Beethoven', 'Classical composer and pianist'),
+('Drake', 'Canadian rapper, singer, and songwriter'),
+('The Beatles', 'Famous rock band from Liverpool, England'),
+('Elton John', 'English singer, songwriter, and pianist');
+
+-- Insert data into Publisher table
+INSERT INTO Publisher (name, description) VALUES
+('Sony Music', 'Global music publishing and recording company'),
+('Universal Music Group', 'Multinational music corporation'),
+('Warner Music Group', 'American multinational music and entertainment conglomerate'),
+('Columbia Records', 'Legendary American record label under Sony Music'),
+('Capitol Records', 'American record label based in Hollywood'),
+('Island Records', 'British record label under Universal Music Group'),
+('EMI Records', 'International record label acquired by Universal Music Group');
+
+-- Insert data into Albums table
+INSERT INTO Albums (title, format, artist_id, genre, publisher_id, date) VALUES
+('Abbey Road', 'Vinyl', 6, 'rock', 2, '1969-09-26'),
+('Lemonade', 'CD', 2, 'pop', 1, '2016-04-23'),
+('Kind of Blue', 'Vinyl', 3, 'jazz', 3, '1959-08-17'),
+('The Dark Side of the Moon', 'CD', 6, 'rock', 4, '1973-03-01'),
+('Scorpion', 'Digital', 5, 'hip-hop', 2, '2018-06-29'),
+('Beethoven: Symphony No. 5', 'Vinyl', 4, 'classical', 5, '1808-12-22'),
+('Goodbye Yellow Brick Road', 'CD', 7, 'pop', 6, '1973-10-05');
+
+-- Insert data into Tracks table
+INSERT INTO Tracks (name, price, album_id, file_size, time) VALUES
+('Come Together', 1.99, 1, 5.2, '04:20'),
+('Formation', 1.29, 2, 4.9, '03:40'),
+('So What', 2.99, 3, 7.5, '09:22'),
+('Hey Jude', 1.49, 4, 6.1, '07:11'),
+('God’s Plan', 1.79, 5, 4.3, '03:18'),
+('Symphony No. 5', 3.49, 6, 12.4, '07:15'),
+('Rocket Man', 1.99, 7, 5.7, '04:41');
+
+-- Insert data into Orders table
+INSERT INTO Orders (user_id, date, total_price, quantity) VALUES
+(1, '2024-11-01', 10.97, 3),
+(2, '2024-11-02', 6.47, 2),
+(3, '2024-11-03', 15.47, 5),
+(4, '2024-11-04', 3.78, 1),
+(5, '2024-11-05', 10.97, 3),
+(6, '2024-11-06', 7.77, 2),
+(7, '2024-11-07', 13.47, 4);
+
+-- Insert data into Orders_Tracks table
+INSERT INTO Orders_Tracks (order_id, track_id) VALUES
+(1, 1),
+(1, 2),
+(1, 3),
+(2, 4),
+(2, 5),
+(3, 6),
+(3, 7),
+(4, 1),
+(5, 2),
+(6, 3),
+(6, 4),
+(7, 5);
+
+-- Insert data into A_A table (Artists and Albums association)
+INSERT INTO A_A (artist_id, album_id) VALUES
+(6, 1),
+(2, 2),
+(3, 3),
+(6, 4),
+(5, 5),
+(4, 6),
+(7, 7);
+-------------------------------------------------------------
