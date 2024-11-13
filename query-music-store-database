@@ -1,0 +1,73 @@
+-- Define ENUM type for role
+CREATE TYPE role_type AS ENUM ('admin', 'customer');
+
+-- Define ENUM type for genre
+CREATE TYPE genre_type AS ENUM ('pop', 'rock', 'jazz', 'classical', 'hip-hop', 'electronic', 'country', 'other');
+
+-- Create the Users table
+CREATE TABLE Users (
+    user_id SERIAL PRIMARY KEY,
+    name VARCHAR(255),
+    address VARCHAR(255),
+    phone VARCHAR(20),
+    role role_type,
+    email VARCHAR(100)
+);
+
+-- Create the Artists table
+CREATE TABLE Artists (
+    artist_id SERIAL PRIMARY KEY,
+    name VARCHAR(255),
+    description TEXT
+);
+
+-- Create the Publisher table
+CREATE TABLE Publisher (
+    publisher_id SERIAL PRIMARY KEY,
+    name VARCHAR(255),
+    description TEXT
+);
+
+-- Create the Albums table
+CREATE TABLE Albums (
+    album_id SERIAL PRIMARY KEY,
+    title VARCHAR(255),
+    format VARCHAR(50),
+    artist_id INT REFERENCES Artists(artist_id) ,
+    genre genre_type,
+    publisher_id INT REFERENCES Publisher(publisher_id) ,
+    date DATE
+);
+
+-- Create the Tracks table
+CREATE TABLE Tracks (
+    track_id SERIAL PRIMARY KEY,
+    name VARCHAR(255),
+    price NUMERIC(10, 2),
+    album_id INT REFERENCES Albums(album_id) ON DELETE SET NULL,
+    file_size NUMERIC(10, 2),
+    time TIME
+);
+
+-- Create the Orders table
+CREATE TABLE Orders (
+    order_id SERIAL PRIMARY KEY,
+    user_id INT REFERENCES Users(user_id) ON DELETE CASCADE,
+    date DATE,
+    total_price NUMERIC(10, 2),
+    quantity INT
+);
+
+-- Create the Orders_Tracks table to link Orders and Tracks
+CREATE TABLE Orders_Tracks (
+    order_id INT REFERENCES Orders(order_id) ON DELETE CASCADE,
+    track_id INT REFERENCES Tracks(track_id) ON DELETE CASCADE,
+    PRIMARY KEY (order_id, track_id)
+);
+
+-- Create the A_A table (Associative table for Artists and Albums)
+CREATE TABLE A_A (
+    artist_id INT REFERENCES Artists(artist_id) ON DELETE CASCADE,
+    album_id INT REFERENCES Albums(album_id) ON DELETE CASCADE,
+    PRIMARY KEY (artist_id, album_id)
+);
