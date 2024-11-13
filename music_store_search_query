@@ -1,0 +1,19 @@
+select * from users;
+select * from Artists;
+select * from albums;
+select * from orders;
+select * from publisher;
+select * from tracks;
+select * from a_a;
+select * from orders_tracks;
+-------------------------------------01
+SELECT a.album_id,a.title,
+COUNT(t.track_id) as number_of_tracks,
+AVG(t.time) as average_time,
+SUM(t.price) as total_price
+FROM Albums a
+LEFT JOIN tracks t ON a.album_id = t.album_id GROUP BY a.album_id ORDER BY total_price DESC;
+
+
+----------------------------------------------------------------------02
+
